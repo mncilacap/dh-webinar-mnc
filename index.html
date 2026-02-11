@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <!-- 2. Instansi (Posisinya di atas Rangkuman) -->
+                <!-- 2. Instansi -->
                 <div class="space-y-2 relative">
                     <label class="text-sm font-semibold text-slate-700 block">Instansi</label>
                     <div id="instansiTrigger" class="bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 cursor-pointer flex justify-between items-center hover:bg-white transition-all">
@@ -70,17 +70,17 @@
                 <!-- 4. Kesan -->
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-700 block">Kesan</label>
-                    <textarea id="kesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Apa kesan Anda mengikuti webinar ini?"></textarea>
+                    <textarea id="kesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Apa kesan Anda?"></textarea>
                 </div>
 
                 <!-- 5. Pesan -->
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-slate-700 block">Pesan</label>
-                    <textarea id="pesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Sampaikan pesan untuk panitia..."></textarea>
+                    <textarea id="pesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Pesan untuk panitia..."></textarea>
                 </div>
 
                 <!-- Tombol Kirim -->
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center">
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center disabled:opacity-50">
                     Kirim Daftar Hadir
                 </button>
 
@@ -90,14 +90,12 @@
         <div class="pb-6 text-center text-[10px] text-slate-400 uppercase tracking-widest">MNC © 2026</div>
     </div>
 
-    <!-- Overlay untuk menutup dropdown jika klik di luar -->
+    <!-- Overlay -->
     <div id="overlay" class="fixed inset-0 z-10 hidden bg-black/5"></div>
 
     <script>
-        // MASUKKAN URL WEB APP GOOGLE SCRIPT ANDA DI SINI
+        // SCRIPT_URL disesuaikan untuk mengirim Nama, Instansi, Rangkuman, Kesan, Pesan
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RU8DwFfPjFlUiusFKPIJzRqwDCRS5DAub5QU-7RQPkvGE_aIK2VKA-spTnhJVGZR/exec';
-        
-        // URL Data Nama dan Instansi
         const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQmBw7t7CYNsi1abmv4Ed1Qo82x8dr9xfaRmpBk9pwyCakEuSxQFG76RxYLXZLEmtBDswPvF6OOw3LR/pub?gid=522171751&single=true&output=csv';
 
         let dataNama = [];
@@ -105,18 +103,18 @@
         let selectedName = "";
         let selectedInstansi = "";
 
-        const nameTrigger = document.getElementById('nameTrigger');
-        const nameMenu = document.getElementById('nameMenu');
-        const nameList = document.getElementById('nameList');
-        const nameSearch = document.getElementById('nameSearch');
-        const selectedNameText = document.getElementById('selectedNameText');
+        const nTrigger = document.getElementById('nameTrigger');
+        const nMenu = document.getElementById('nameMenu');
+        const nList = document.getElementById('nameList');
+        const nSearch = document.getElementById('nameSearch');
+        const nText = document.getElementById('selectedNameText');
 
-        const instansiTrigger = document.getElementById('instansiTrigger');
-        const instansiMenu = document.getElementById('instansiMenu');
-        const instansiList = document.getElementById('instansiList');
-        const instansiSearch = document.getElementById('instansiSearch');
-        const selectedInstansiText = document.getElementById('selectedInstansiText');
-
+        const iTrigger = document.getElementById('instansiTrigger');
+        const iMenu = document.getElementById('instansiMenu');
+        const iList = document.getElementById('instansiList');
+        const iSearch = document.getElementById('instansiSearch');
+        const iText = document.getElementById('selectedInstansiText');
+        
         const overlay = document.getElementById('overlay');
 
         async function initData() {
@@ -125,49 +123,46 @@
                 const csv = await res.text();
                 const lines = csv.split(/\r?\n/);
                 
-                let rawNames = [];
-                let rawInstansi = [];
+                let names = [];
+                let institutes = [];
 
-                lines.forEach((line, index) => {
-                    if (index === 0) return; // Skip Header
+                lines.forEach((line, idx) => {
+                    if (idx === 0) return;
                     const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    
                     let n = cols[1] ? cols[1].replace(/"/g, '').trim() : "";
                     let i = cols[3] ? cols[3].replace(/"/g, '').trim() : "";
-                    
-                    if (n) rawNames.push(n);
-                    if (i) rawInstansi.push(i);
+                    if (n) names.push(n);
+                    if (i) institutes.push(i);
                 });
 
-                // Set unik agar instansi tidak ganda
-                dataNama = [...new Set(rawNames)].sort();
-                dataInstansi = [...new Set(rawInstansi)].sort();
+                dataNama = [...new Set(names)].sort();
+                dataInstansi = [...new Set(institutes)].sort();
 
-                renderList(nameList, dataNama, 'name');
-                renderList(instansiList, dataInstansi, 'instansi');
+                renderList(nList, dataNama, 'name');
+                renderList(iList, dataInstansi, 'instansi');
                 
-                selectedNameText.innerText = "Pilih Nama Anda...";
-                selectedInstansiText.innerText = "Pilih Instansi...";
+                nText.innerText = "Cari nama Anda...";
+                iText.innerText = "Pilih instansi...";
             } catch (e) {
-                selectedNameText.innerText = "Gagal memuat data";
+                nText.innerText = "Error memuat data";
             }
         }
 
         function renderList(container, data, type) {
             container.innerHTML = data.length > 0 
                 ? data.map(item => `<div class="item px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none">${item}</div>`).join('')
-                : `<div class="p-4 text-center text-slate-400 text-sm italic">Data tidak ditemukan</div>`;
+                : `<div class="p-4 text-center text-slate-400 text-sm italic">Tidak ditemukan</div>`;
             
             container.querySelectorAll('.item').forEach(el => {
                 el.onclick = () => {
                     if(type === 'name') {
                         selectedName = el.innerText;
-                        selectedNameText.innerText = selectedName;
-                        selectedNameText.classList.replace('text-slate-400', 'text-slate-900');
+                        nText.innerText = selectedName;
+                        nText.classList.replace('text-slate-400', 'text-slate-900');
                     } else {
                         selectedInstansi = el.innerText;
-                        selectedInstansiText.innerText = selectedInstansi;
-                        selectedInstansiText.classList.replace('text-slate-400', 'text-slate-900');
+                        iText.innerText = selectedInstansi;
+                        iText.classList.replace('text-slate-400', 'text-slate-900');
                     }
                     closeAll();
                 };
@@ -175,29 +170,22 @@
         }
 
         function closeAll() {
-            nameMenu.classList.add('hidden');
-            instansiMenu.classList.add('hidden');
+            nMenu.classList.add('hidden');
+            iMenu.classList.add('hidden');
             overlay.classList.add('hidden');
         }
 
-        nameTrigger.onclick = () => { closeAll(); nameMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); nameSearch.focus(); };
-        instansiTrigger.onclick = () => { closeAll(); instansiMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); instansiSearch.focus(); };
+        nTrigger.onclick = () => { closeAll(); nMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); nSearch.focus(); };
+        iTrigger.onclick = () => { closeAll(); iMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); iSearch.focus(); };
         overlay.onclick = closeAll;
 
-        nameSearch.oninput = (e) => {
-            const val = e.target.value.toLowerCase();
-            renderList(nameList, dataNama.filter(x => x.toLowerCase().includes(val)), 'name');
-        };
-
-        instansiSearch.oninput = (e) => {
-            const val = e.target.value.toLowerCase();
-            renderList(instansiList, dataInstansi.filter(x => x.toLowerCase().includes(val)), 'instansi');
-        };
+        nSearch.oninput = (e) => renderList(nList, dataNama.filter(x => x.toLowerCase().includes(e.target.value.toLowerCase())), 'name');
+        iSearch.oninput = (e) => renderList(iList, dataInstansi.filter(x => x.toLowerCase().includes(e.target.value.toLowerCase())), 'instansi');
 
         document.getElementById('attendanceForm').onsubmit = async (e) => {
             e.preventDefault();
             if(!selectedName || !selectedInstansi) {
-                alert("Silakan pilih Nama dan Instansi!");
+                alert("Pilih Nama dan Instansi!");
                 return;
             }
 
@@ -211,10 +199,8 @@
             params.append('Rangkuman', document.getElementById('rangkuman').value);
             params.append('Kesan', document.getElementById('kesan').value);
             params.append('Pesan', document.getElementById('pesan').value);
-            params.append('Saran', document.getElementById('saran').value);
 
             try {
-                // Gunakan mode no-cors untuk kirim data ke Google Apps Script
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -223,16 +209,16 @@
                 });
 
                 document.getElementById('main-container').innerHTML = `
-                    <div class="p-12 text-center">
+                    <div class="p-12 text-center animate-in fade-in duration-500">
                         <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                         <h2 class="text-xl font-bold text-slate-800">Berhasil!</h2>
-                        <p class="text-slate-500 mt-2 text-sm">Terima kasih, presensi Anda telah tercatat.</p>
+                        <p class="text-slate-500 mt-2 text-sm">Terima kasih, data telah tersimpan.</p>
                         <button onclick="location.reload()" class="mt-8 w-full py-4 bg-blue-600 text-white rounded-xl font-bold">Kembali</button>
                     </div>`;
             } catch (err) {
-                alert("Terjadi kesalahan pengiriman. Pastikan SCRIPT_URL sudah benar.");
+                alert("Gagal mengirim.");
                 btn.disabled = false;
                 btn.innerText = "Kirim Daftar Hadir";
             }
