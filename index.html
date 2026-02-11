@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presensi Webinar MNC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .dropdown-animate { animation: slideDown 0.2s ease-out; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #nameList::-webkit-scrollbar { width: 5px; }
+        #nameList::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div id="main-container" class="max-w-md w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
+        <!-- Header -->
+        <div class="bg-blue-700 p-8 text-white text-center">
+            <h1 class="text-xl font-bold uppercase tracking-wider">Daftar Hadir</h1>
+            <p class="text-lg font-semibold mt-2">Webinar Game Edukasi Matematika</p>
+            <p class="text-blue-200 text-sm mt-1">Matematika Nusantara Cilacap</p>
+        </div>
+
+        <!-- Form Body -->
+        <div id="form-body" class="p-8">
+            <form id="attendanceForm" class="space-y-6">
+                
+                <!-- Pertanyaan 1: Nama -->
+                <div class="space-y-2 relative">
+                    <label class="text-sm font-semibold text-slate-700 block">
+                        Pilih Nama
+                    </label>
+                    <div id="dropdownTrigger" class="bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 cursor-pointer flex justify-between items-center hover:bg-white transition-all">
+                        <span id="selectedNameText" class="text-slate-400">Memuat daftar nama...</span>
+                        <svg id="arrowIcon" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Menu Dropdown Pencarian -->
+                    <div id="dropdownMenu" class="hidden absolute z-20 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-xl overflow-hidden dropdown-animate">
+                        <div class="p-2 bg-slate-100 border-b">
+                            <input type="text" id="searchInput" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cari nama Anda...">
+                        </div>
+                        <div id="nameList" class="max-h-60 overflow-y-auto">
+                            <!-- Nama dimuat di sini -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pertanyaan 2: Rangkuman Materi -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 block">
+                        Rangkuman Materi
+                    </label>
+                    <textarea id="rangkuman" required rows="5" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Tuliskan poin-poin penting materi hari ini..."></textarea>
+                </div>
+
+                <!-- Tombol Kirim -->
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center">
+                    Kirim Daftar Hadir
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="pb-6 text-center text-[10px] text-slate-400 uppercase tracking-widest">
+            MNC © 2026
+        </div>
+    </div>
+
+    <div id="overlay" class="fixed inset-0 z-10 hidden"></div>
+
+    <script>
+        // PASTIKAN URL INI ADALAH URL "EXEC" DARI DEPLOYMENT TERBARU
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6UaXfXvWIK9O8XN51osOeZiD2Gf9ysFITqf6QQ2UaoIbe_fmwxu8nNhK4BMJlDyq_/exec';
+        
+        const DATA_NAMA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQmBw7t7CYNsi1abmv4Ed1Qo82x8dr9xfaRmpBk9pwyCakEuSxQFG76RxYLXZLEmtBDswPvF6OOw3LR/pub?gid=522171751&single=true&output=csv';
+
+        let allNames = [];
+        let selectedName = "";
+
+        const dropdownTrigger = document.getElementById('dropdownTrigger');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const overlay = document.getElementById('overlay');
+        const nameList = document.getElementById('nameList');
+        const searchInput = document.getElementById('searchInput');
+        const selectedNameText = document.getElementById('selectedNameText');
+        const form = document.getElementById('attendanceForm');
+
+        async function fetchNames() {
+            try {
+                const response = await fetch(DATA_NAMA_URL + '&t=' + new Date().getTime());
+                const text = await response.text();
+                const lines = text.split(/\r?\n/);
+                
+                allNames = lines
+                    .map(line => {
+                        const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        let val = cols[1] ? cols[1].replace(/"/g, '').trim() : null;
+                        return val;
+                    })
+                    .filter(n => {
+                        if (!n) return false;
+                        const forbidden = ['NAMA', 'NAMA LENGKAP', 'TIMESTAMP', 'PESERTA', 'FULL NAME'];
+                        return !forbidden.includes(n.toUpperCase());
+                    });
+                
+                allNames = [...new Set(allNames)].sort();
+                renderNames(allNames);
+                selectedNameText.innerText = "Pilih Nama Anda...";
+            } catch (err) {
+                selectedNameText.innerText = "Gagal memuat daftar nama";
+            }
+        }
+
+        function renderNames(names) {
+            nameList.innerHTML = names.length > 0 
+                ? names.map(n => `<div class="name-item px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-none transition-colors">${n}</div>`).join('')
+                : `<div class="p-4 text-center text-slate-400 text-sm italic">Nama tidak ditemukan</div>`;
+            
+            document.querySelectorAll('.name-item').forEach(item => {
+                item.onclick = () => {
+                    selectedName = item.innerText;
+                    selectedNameText.innerText = selectedName;
+                    selectedNameText.classList.replace('text-slate-400', 'text-slate-900');
+                    selectedNameText.classList.add('font-medium');
+                    toggleDropdown(false);
+                }
+            });
+        }
+
+        function toggleDropdown(show) {
+            dropdownMenu.classList.toggle('hidden', !show);
+            overlay.classList.toggle('hidden', !show);
+            document.getElementById('arrowIcon').style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)';
+            if(show) setTimeout(() => searchInput.focus(), 100);
+        }
+
+        searchInput.oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            renderNames(allNames.filter(n => n.toLowerCase().includes(val)));
+        };
+
+        dropdownTrigger.onclick = () => toggleDropdown(dropdownMenu.classList.contains('hidden'));
+        overlay.onclick = () => toggleDropdown(false);
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!selectedName) return alert("Silakan pilih nama Anda!");
+
+            const btn = document.getElementById('submitBtn');
+            const originalBtnText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "Sedang Mengirim...";
+
+            try {
+                const formData = new FormData();
+                formData.append('Nama', selectedName);
+                formData.append('Rangkuman', document.getElementById('rangkuman').value);
+
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: new URLSearchParams(formData)
+                });
+
+                document.getElementById('main-container').innerHTML = `
+                    <div class="p-12 text-center animate-in fade-in duration-700">
+                        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Presensi Berhasil!</h2>
+                        <p class="text-slate-500 mt-2 leading-relaxed">Terima kasih, data Anda telah tersimpan di sistem kami.</p>
+                        <button onclick="location.reload()" class="mt-8 w-full py-4 bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all">Isi Kembali</button>
+                    </div>`;
+            } catch (err) {
+                console.error("Error Detail:", err);
+                alert("Gagal mengirim. Pastikan Anda telah meng-Deploy Apps Script sebagai 'Anyone'.");
+                btn.disabled = false;
+                btn.innerText = originalBtnText;
+            }
+        };
+
+        window.onload = fetchNames;
+    </script>
+</body>
+</html>
