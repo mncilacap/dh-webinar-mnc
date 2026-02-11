@@ -13,53 +13,76 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        #nameList::-webkit-scrollbar { width: 5px; }
-        #nameList::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
 
-    <div id="main-container" class="max-w-md w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
+    <div id="main-container" class="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 my-8">
         <!-- Header -->
         <div class="bg-blue-700 p-8 text-white text-center">
             <h1 class="text-xl font-bold uppercase tracking-wider">Daftar Hadir</h1>
-            <p class="text-lg font-semibold mt-2">Webinar Game Edukasi Matematika</p>
+            <p class="text-lg font-semibold mt-2 leading-tight">Webinar Game Edukasi Matematika</p>
             <p class="text-blue-200 text-sm mt-1">Matematika Nusantara Cilacap</p>
         </div>
 
         <!-- Form Body -->
         <div id="form-body" class="p-8">
-            <form id="attendanceForm" class="space-y-6">
+            <form id="attendanceForm" class="space-y-5">
                 
-                <!-- Pertanyaan 1: Nama -->
+                <!-- 1. Pilih Nama -->
                 <div class="space-y-2 relative">
-                    <label class="text-sm font-semibold text-slate-700 block">
-                        Pilih Nama
-                    </label>
-                    <div id="dropdownTrigger" class="bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 cursor-pointer flex justify-between items-center hover:bg-white transition-all">
-                        <span id="selectedNameText" class="text-slate-400">Memuat daftar nama...</span>
-                        <svg id="arrowIcon" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
+                    <label class="text-sm font-semibold text-slate-700 block">Pilih Nama</label>
+                    <div id="nameTrigger" class="bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 cursor-pointer flex justify-between items-center hover:bg-white transition-all">
+                        <span id="selectedNameText" class="text-slate-400 text-sm">Memuat nama...</span>
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                     </div>
-
-                    <!-- Menu Dropdown Pencarian -->
-                    <div id="dropdownMenu" class="hidden absolute z-20 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-xl overflow-hidden dropdown-animate">
+                    <div id="nameMenu" class="hidden absolute z-30 w-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden dropdown-animate">
                         <div class="p-2 bg-slate-100 border-b">
-                            <input type="text" id="searchInput" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cari nama Anda...">
+                            <input type="text" id="nameSearch" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cari nama...">
                         </div>
-                        <div id="nameList" class="max-h-60 overflow-y-auto">
-                            <!-- Nama dimuat di sini -->
-                        </div>
+                        <div id="nameList" class="max-h-48 overflow-y-auto custom-scroll"></div>
                     </div>
                 </div>
 
-                <!-- Pertanyaan 2: Rangkuman Materi -->
+                <!-- 2. Instansi (Posisinya di atas Rangkuman) -->
+                <div class="space-y-2 relative">
+                    <label class="text-sm font-semibold text-slate-700 block">Instansi</label>
+                    <div id="instansiTrigger" class="bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 cursor-pointer flex justify-between items-center hover:bg-white transition-all">
+                        <span id="selectedInstansiText" class="text-slate-400 text-sm">Pilih Instansi...</span>
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </div>
+                    <div id="instansiMenu" class="hidden absolute z-20 w-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden dropdown-animate">
+                        <div class="p-2 bg-slate-100 border-b">
+                            <input type="text" id="instansiSearch" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Cari instansi...">
+                        </div>
+                        <div id="instansiList" class="max-h-48 overflow-y-auto custom-scroll"></div>
+                    </div>
+                </div>
+
+                <!-- 3. Rangkuman Materi -->
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-slate-700 block">
-                        Rangkuman Materi
-                    </label>
-                    <textarea id="rangkuman" required rows="5" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Tuliskan poin-poin penting materi hari ini..."></textarea>
+                    <label class="text-sm font-semibold text-slate-700 block">Rangkuman Materi</label>
+                    <textarea id="rangkuman" required rows="3" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Tuliskan poin penting materi..."></textarea>
+                </div>
+
+                <!-- 4. Kesan -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 block">Kesan</label>
+                    <textarea id="kesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Apa kesan Anda mengikuti webinar ini?"></textarea>
+                </div>
+
+                <!-- 5. Pesan -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 block">Pesan</label>
+                    <textarea id="pesan" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Sampaikan pesan untuk panitia..."></textarea>
+                </div>
+
+                <!-- 6. Saran -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-slate-700 block">Saran</label>
+                    <textarea id="saran" required rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Saran untuk webinar mendatang..."></textarea>
                 </div>
 
                 <!-- Tombol Kirim -->
@@ -70,126 +93,158 @@
             </form>
         </div>
 
-        <!-- Footer -->
-        <div class="pb-6 text-center text-[10px] text-slate-400 uppercase tracking-widest">
-            MNC © 2026
-        </div>
+        <div class="pb-6 text-center text-[10px] text-slate-400 uppercase tracking-widest">MNC © 2026</div>
     </div>
 
-    <div id="overlay" class="fixed inset-0 z-10 hidden"></div>
+    <!-- Overlay untuk menutup dropdown jika klik di luar -->
+    <div id="overlay" class="fixed inset-0 z-10 hidden bg-black/5"></div>
 
     <script>
-        // PASTIKAN URL INI ADALAH URL "EXEC" DARI DEPLOYMENT TERBARU
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6UaXfXvWIK9O8XN51osOeZiD2Gf9ysFITqf6QQ2UaoIbe_fmwxu8nNhK4BMJlDyq_/exec';
+        // MASUKKAN URL WEB APP GOOGLE SCRIPT ANDA DI SINI
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8RU8DwFfPjFlUiusFKPIJzRqwDCRS5DAub5QU-7RQPkvGE_aIK2VKA-spTnhJVGZR/exec';
         
-        const DATA_NAMA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQmBw7t7CYNsi1abmv4Ed1Qo82x8dr9xfaRmpBk9pwyCakEuSxQFG76RxYLXZLEmtBDswPvF6OOw3LR/pub?gid=522171751&single=true&output=csv';
+        // URL Data Nama dan Instansi
+        const DATA_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQmBw7t7CYNsi1abmv4Ed1Qo82x8dr9xfaRmpBk9pwyCakEuSxQFG76RxYLXZLEmtBDswPvF6OOw3LR/pub?gid=522171751&single=true&output=csv';
 
-        let allNames = [];
+        let dataNama = [];
+        let dataInstansi = [];
         let selectedName = "";
+        let selectedInstansi = "";
 
-        const dropdownTrigger = document.getElementById('dropdownTrigger');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const overlay = document.getElementById('overlay');
+        const nameTrigger = document.getElementById('nameTrigger');
+        const nameMenu = document.getElementById('nameMenu');
         const nameList = document.getElementById('nameList');
-        const searchInput = document.getElementById('searchInput');
+        const nameSearch = document.getElementById('nameSearch');
         const selectedNameText = document.getElementById('selectedNameText');
-        const form = document.getElementById('attendanceForm');
 
-        async function fetchNames() {
+        const instansiTrigger = document.getElementById('instansiTrigger');
+        const instansiMenu = document.getElementById('instansiMenu');
+        const instansiList = document.getElementById('instansiList');
+        const instansiSearch = document.getElementById('instansiSearch');
+        const selectedInstansiText = document.getElementById('selectedInstansiText');
+
+        const overlay = document.getElementById('overlay');
+
+        async function initData() {
             try {
-                const response = await fetch(DATA_NAMA_URL + '&t=' + new Date().getTime());
-                const text = await response.text();
-                const lines = text.split(/\r?\n/);
+                const res = await fetch(DATA_URL + '&cache=' + Date.now());
+                const csv = await res.text();
+                const lines = csv.split(/\r?\n/);
                 
-                allNames = lines
-                    .map(line => {
-                        const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                        let val = cols[1] ? cols[1].replace(/"/g, '').trim() : null;
-                        return val;
-                    })
-                    .filter(n => {
-                        if (!n) return false;
-                        const forbidden = ['NAMA', 'NAMA LENGKAP', 'TIMESTAMP', 'PESERTA', 'FULL NAME'];
-                        return !forbidden.includes(n.toUpperCase());
-                    });
+                let rawNames = [];
+                let rawInstansi = [];
+
+                lines.forEach((line, index) => {
+                    if (index === 0) return; // Skip Header
+                    const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    
+                    let n = cols[1] ? cols[1].replace(/"/g, '').trim() : "";
+                    let i = cols[3] ? cols[3].replace(/"/g, '').trim() : "";
+                    
+                    if (n) rawNames.push(n);
+                    if (i) rawInstansi.push(i);
+                });
+
+                // Set unik agar instansi tidak ganda
+                dataNama = [...new Set(rawNames)].sort();
+                dataInstansi = [...new Set(rawInstansi)].sort();
+
+                renderList(nameList, dataNama, 'name');
+                renderList(instansiList, dataInstansi, 'instansi');
                 
-                allNames = [...new Set(allNames)].sort();
-                renderNames(allNames);
                 selectedNameText.innerText = "Pilih Nama Anda...";
-            } catch (err) {
-                selectedNameText.innerText = "Gagal memuat daftar nama";
+                selectedInstansiText.innerText = "Pilih Instansi...";
+            } catch (e) {
+                selectedNameText.innerText = "Gagal memuat data";
             }
         }
 
-        function renderNames(names) {
-            nameList.innerHTML = names.length > 0 
-                ? names.map(n => `<div class="name-item px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-none transition-colors">${n}</div>`).join('')
-                : `<div class="p-4 text-center text-slate-400 text-sm italic">Nama tidak ditemukan</div>`;
+        function renderList(container, data, type) {
+            container.innerHTML = data.length > 0 
+                ? data.map(item => `<div class="item px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none">${item}</div>`).join('')
+                : `<div class="p-4 text-center text-slate-400 text-sm italic">Data tidak ditemukan</div>`;
             
-            document.querySelectorAll('.name-item').forEach(item => {
-                item.onclick = () => {
-                    selectedName = item.innerText;
-                    selectedNameText.innerText = selectedName;
-                    selectedNameText.classList.replace('text-slate-400', 'text-slate-900');
-                    selectedNameText.classList.add('font-medium');
-                    toggleDropdown(false);
-                }
+            container.querySelectorAll('.item').forEach(el => {
+                el.onclick = () => {
+                    if(type === 'name') {
+                        selectedName = el.innerText;
+                        selectedNameText.innerText = selectedName;
+                        selectedNameText.classList.replace('text-slate-400', 'text-slate-900');
+                    } else {
+                        selectedInstansi = el.innerText;
+                        selectedInstansiText.innerText = selectedInstansi;
+                        selectedInstansiText.classList.replace('text-slate-400', 'text-slate-900');
+                    }
+                    closeAll();
+                };
             });
         }
 
-        function toggleDropdown(show) {
-            dropdownMenu.classList.toggle('hidden', !show);
-            overlay.classList.toggle('hidden', !show);
-            document.getElementById('arrowIcon').style.transform = show ? 'rotate(180deg)' : 'rotate(0deg)';
-            if(show) setTimeout(() => searchInput.focus(), 100);
+        function closeAll() {
+            nameMenu.classList.add('hidden');
+            instansiMenu.classList.add('hidden');
+            overlay.classList.add('hidden');
         }
 
-        searchInput.oninput = (e) => {
+        nameTrigger.onclick = () => { closeAll(); nameMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); nameSearch.focus(); };
+        instansiTrigger.onclick = () => { closeAll(); instansiMenu.classList.remove('hidden'); overlay.classList.remove('hidden'); instansiSearch.focus(); };
+        overlay.onclick = closeAll;
+
+        nameSearch.oninput = (e) => {
             const val = e.target.value.toLowerCase();
-            renderNames(allNames.filter(n => n.toLowerCase().includes(val)));
+            renderList(nameList, dataNama.filter(x => x.toLowerCase().includes(val)), 'name');
         };
 
-        dropdownTrigger.onclick = () => toggleDropdown(dropdownMenu.classList.contains('hidden'));
-        overlay.onclick = () => toggleDropdown(false);
+        instansiSearch.oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            renderList(instansiList, dataInstansi.filter(x => x.toLowerCase().includes(val)), 'instansi');
+        };
 
-        form.onsubmit = async (e) => {
+        document.getElementById('attendanceForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (!selectedName) return alert("Silakan pilih nama Anda!");
+            if(!selectedName || !selectedInstansi) {
+                alert("Silakan pilih Nama dan Instansi!");
+                return;
+            }
 
             const btn = document.getElementById('submitBtn');
-            const originalBtnText = btn.innerText;
             btn.disabled = true;
-            btn.innerText = "Sedang Mengirim...";
+            btn.innerText = "Mengirim...";
+
+            const params = new URLSearchParams();
+            params.append('Nama', selectedName);
+            params.append('Instansi', selectedInstansi);
+            params.append('Rangkuman', document.getElementById('rangkuman').value);
+            params.append('Kesan', document.getElementById('kesan').value);
+            params.append('Pesan', document.getElementById('pesan').value);
+            params.append('Saran', document.getElementById('saran').value);
 
             try {
-                const formData = new FormData();
-                formData.append('Nama', selectedName);
-                formData.append('Rangkuman', document.getElementById('rangkuman').value);
-
+                // Gunakan mode no-cors untuk kirim data ke Google Apps Script
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: new URLSearchParams(formData)
+                    body: params.toString(),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
                 });
 
                 document.getElementById('main-container').innerHTML = `
-                    <div class="p-12 text-center animate-in fade-in duration-700">
-                        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <div class="p-12 text-center">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Presensi Berhasil!</h2>
-                        <p class="text-slate-500 mt-2 leading-relaxed">Terima kasih, data Anda telah tersimpan di sistem kami.</p>
-                        <button onclick="location.reload()" class="mt-8 w-full py-4 bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all">Isi Kembali</button>
+                        <h2 class="text-xl font-bold text-slate-800">Berhasil!</h2>
+                        <p class="text-slate-500 mt-2 text-sm">Terima kasih, presensi Anda telah tercatat.</p>
+                        <button onclick="location.reload()" class="mt-8 w-full py-4 bg-blue-600 text-white rounded-xl font-bold">Kembali</button>
                     </div>`;
             } catch (err) {
-                console.error("Error Detail:", err);
-                alert("Gagal mengirim. Pastikan Anda telah meng-Deploy Apps Script sebagai 'Anyone'.");
+                alert("Terjadi kesalahan pengiriman. Pastikan SCRIPT_URL sudah benar.");
                 btn.disabled = false;
-                btn.innerText = originalBtnText;
+                btn.innerText = "Kirim Daftar Hadir";
             }
         };
 
-        window.onload = fetchNames;
+        window.onload = initData;
     </script>
 </body>
 </html>
